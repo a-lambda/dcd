@@ -22,47 +22,39 @@ taille_donnees <- c(
 # 
 db_get_nom <- function(string) {
   
-  pattern_nom = "(.*?)[*]"
+  pattern_nom <- "(.*?)[*]"
   nom <- stri_match_all_regex(
     str = string,
     pattern = pattern_nom
   )[[1]][,2]
   
-  return(nom)
-  
 }
 
 db_get_prenoms <- function(string) {
   
-  pattern_nom = "[*](.*)[/]$"
+  pattern_nom <- "[*](.*)[/]$"
   prenoms <- stri_match_all_regex(
     str = string,
     pattern = pattern_nom
   )[[1]][,2]
-  
-  return(prenoms)
-  
+
 }
 
 db_get_date <- function(string, format = "%Y%m%d") {
   
   # return a date or NA if date is not VALID
-  date_event = as.Date(string, format = format, optional = TRUE)
-  
-  return(date_event)
+  date_event <- as.Date(string, format = format, optional = TRUE)
   
 }
 
 db_get_lieu <- function(string) {
   
-  pattern_lieu = "([A-Z0-9 \\-\\']*)"
+  pattern_lieu <- "([A-Z0-9 \\-\\']*)"
   lieu <- stri_match_all_regex(
     str = string,
     pattern = pattern_lieu
   )[[1]][,2] |> 
-  paste0(collapse = "")
-  
-  return(lieu)
+    paste0(collapse = "")
   
 }
 
@@ -72,8 +64,6 @@ del_nulls_in_text <- function(path_file) {
   raw_text_without_nulls <- raw_text[which(raw_text != as.raw(0))]
   readr::write_file(x = raw_text_without_nulls, file = path_file )
   
-  return()
-
 }
 
 # à cause de "SAN ANTONIO DI SUSANULNULNULNULNULNULNULNULNULNULNULITALIE"
@@ -82,8 +72,6 @@ replace_nulls_int_text <- function(path_file, code) {
   raw_text <- read_file_raw(path_file)
   raw_text[which(raw_text == as.raw(0))] <- as.raw(code)
   readr::write_file(x = raw_text, file = path_file )
-
-  return()
 
 }
 
@@ -105,11 +93,10 @@ list.files(dossier_temp, full.names = TRUE) |>
 db_raw_deces <- list.files(dossier_temp,
                            pattern = "[.]txt$",
                            full.names = TRUE) |> 
-  map(read_fwf, 
-      col_positions = fwf_widths(taille_donnees, 
-                                 col_names = names(taille_donnees)),
-      col_types = cols(
-        .default = col_character())
+  map(
+    read_fwf, 
+    col_positions = fwf_widths(taille_donnees,  col_names = names(taille_donnees)),
+    col_types = cols(.default = col_character())
   ) 
 
 #------------------------------------- Conversion en UTF-8  
@@ -151,10 +138,9 @@ db_deces <- db_deces_unique_utf8 |>
     # naissance_pays    = db_get_lieu(naissance_pays),
     deces_date        = db_get_date(deces_date_string)
   ) |> 
-  relocate(
-    nom, prenoms, sexe, 
-    naissance_date, naissance_code_insee, naissance_commune, naissance_pays,
-    deces_date, deces_code_insee, deces_numero_acte)
+  relocate(nom, prenoms, sexe, naissance_date, naissance_code_insee,
+           naissance_commune, naissance_pays,
+           deces_date, deces_code_insee, deces_numero_acte)
 
 rm(db_deces_unique_utf8) # gain de mémoire
 

@@ -2,20 +2,24 @@ library(readr)
 library(dplyr)
 library(purrr)
 library(stringi)
-library(outils) # à installer manuellement dans la github publish action
+library(remotes)
+remotes::install_github("a-lambda/outils", force = TRUE)
+library(outils)
 library(RPostgres)
 library(gt)
 
 dossiers <- c(
-  dossier_raw  <- 'inst/rawdata',
-  dossier_raw_deces  <- file.path(dossier_raw, 'deces'),
-  dossier_temp <- 'inst/temp',
-  dossier_data <- 'data'
+  dossier_raw  <- "inst/rawdata",
+  dossier_raw_deces  <- file.path(dossier_raw, "deces"),
+  dossier_temp <- "inst/temp",
+  dossier_data <- "data"
 )
 
 # Création des dossiers
 invisible(
-  sapply(dossiers, \(x) { if (!dir.exists(x)) dir.create(x, recursive = TRUE) })
+  sapply(dossiers, \(x) {
+    if (!dir.exists(x)) dir.create(x, recursive = TRUE)
+  })
 )
 
 if (!"db_deces.RDS" %in% list.files(path = dossier_data)) {
@@ -35,9 +39,13 @@ request <- "SELECT naissance_commune, naissance_date, deces_date,
 
 result <- RPostgres::dbGetQuery(con, statement = request)
 
-if (inherits(result, "data.frame") & (nrow(result) == 50)) {
+if (inherits(result, "data.frame") && (nrow(result) == 50)) {
   gt(result)
 } else {
   source("R/02_sql_section.R")
 }
+
+# don't forget to disconnect every time
+# add index for speed
+# test if data is already loaded to avoid sql error when appending data
 
