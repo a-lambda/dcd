@@ -8,9 +8,9 @@ library(outils)
 library(RPostgres)
 library(gt)
 
+dossier_raw_deces <- data/raw
+
 dossiers <- c(
-  dossier_raw  <- "inst/rawdata",
-  dossier_raw_deces  <- file.path(dossier_raw, "deces"),
   dossier_temp <- "inst/temp",
   dossier_data <- "data"
 )
